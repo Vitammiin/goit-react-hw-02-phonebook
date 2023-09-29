@@ -1,5 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 export class App extends Component {
   state = {
@@ -9,45 +8,33 @@ export class App extends Component {
   };
 
   handleName = event => {
-    console.log(event.target.name);
-    console.log(event.target.value);
     this.setState({
       [event.target.name]: event.target.value,
     });
   };
 
-  addNumber = numberData => {
-    console.log('numberData', numberData);
-    this.setState(prevState => {
-      return {
-        numberData: [...prevState.name],
-      };
-    });
-  };
-
   handleSubmit = event => {
     event.preventDefault();
-    const numberData = {
-      contacts: this.state.contacts,
-      name: this.state.name,
-      number: this.state.number,
-    };
-    this.addNumber(numberData);
-    this.setState({
-      contacts: [],
-      name: '',
-      number: '',
-    });
+    const { contacts, name, number } = this.state;
+    if (contacts.some(contact => contact.name === name)) {
+      alert(`${name} is already in contacts`);
+    } else {
+      const newContact = { name, number };
+      this.setState(prevState => ({
+        contacts: [...prevState.contacts, newContact],
+        name: '',
+        number: '',
+      }));
+    }
   };
 
   render() {
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
-          Name
-          <div>
+          <label>
+            Name
             <input
-              numberData={this.numberData}
               onChange={this.handleName}
               value={this.state.name}
               type="text"
@@ -56,9 +43,9 @@ export class App extends Component {
               title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
               required
             />
-          </div>
-          <p>Number</p>
-          <div>
+          </label>
+          <label>
+            Number
             <input
               onChange={this.handleName}
               value={this.state.number}
@@ -68,15 +55,19 @@ export class App extends Component {
               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
               required
             />
-          </div>
-          <div>
-            <button addNumber={this.addNumber}>Save</button>
-          </div>
-          <div>
-            <h1>Contacts</h1>
-            <p></p>
-          </div>
+          </label>
+          <button type="submit">Save</button>
         </form>
+        <div>
+          <h1>Contacts</h1>
+          <ul>
+            {this.state.contacts.map(contact => (
+              <li key={contact.name}>
+                {contact.name}: {contact.number}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }
