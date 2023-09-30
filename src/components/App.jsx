@@ -5,11 +5,18 @@ export class App extends Component {
     contacts: [],
     name: '',
     number: '',
+    filter: '',
   };
 
   handleName = event => {
     this.setState({
       [event.target.name]: event.target.value,
+    });
+  };
+
+  handFilter = event => {
+    this.setState({
+      filter: event.target.value,
     });
   };
 
@@ -26,6 +33,28 @@ export class App extends Component {
         number: '',
       }));
     }
+  };
+
+  handleFilterChange = event => {
+    this.setState({
+      filter: event.target.value,
+    });
+  };
+
+  filterNum = () => {
+    const { contacts, filter } = this.state;
+    const filteredContacts = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+    return filteredContacts;
+  };
+
+  handleDeleteContact = contactName => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(
+        contact => contact.name !== contactName
+      ),
+    }));
   };
 
   render() {
@@ -60,10 +89,28 @@ export class App extends Component {
         </form>
         <div>
           <h1>Contacts</h1>
+          <input
+            onChange={this.handleFilterChange}
+            value={this.state.filter}
+            type="text"
+            placeholder="Search contacts"
+          />
           <ul>
             {this.state.contacts.map(contact => (
               <li key={contact.name}>
                 {contact.name}: {contact.number}
+                <button
+                  style={{
+                    color: 'white',
+                    borderRadius: '4px',
+                    padding: '8px 16px',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => this.handleDeleteContact(contact.name)}
+                >
+                  Delete
+                </button>
               </li>
             ))}
           </ul>
