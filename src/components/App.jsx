@@ -1,9 +1,16 @@
-// import React, { Component } from 'react';
+import React, { Component } from 'react';
+import Form from './Form/Form';
+import Contacts from './Contacts/Contacts';
 
-export default class Form extends Component {
+export class App extends Component {
   state = {
-    name: '',
-    number: '',
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ],
+    filter: '',
   };
 
   handleName = event => {
@@ -18,50 +25,58 @@ export default class Form extends Component {
     });
   };
 
-  handleSubmit = event => {
-    event.preventDefault();
-    const { name, number } = this.state;
-    this.props.onFormSubmit(name, number); // Передаем данные в родительский компонент
+  handleSumbit = (name, number) => {
+    const { contacts } = this.state;
+    if (contacts.some(contact => contact.name === name)) {
+      alert(`${name} is already in contacts`);
+    } else {
+      this.setState({
+        contacts: [...contacts, { name, number }],
+        name: '',
+        number: '',
+      });
+    }
+  };
+
+  handleFilterChange = event => {
     this.setState({
-      name: '',
-      number: '',
+      filter: event.target.value,
     });
   };
 
+  handleDeleteContact = contactName => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(
+        contact => contact.name !== contactName
+      ),
+    }));
+  };
+
+  filterContacts = () => {
+    const { contacts, filter } = this.state;
+    return {
+      data: contacts.filter(contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase())
+      ),
+      filter: filter,
+    };
+  };
+
+  ß;
+
   render() {
+    const filteredContacts = this.filterContacts();
+
     return (
       <div>
-        <div className="add-input">
-          <p className="name">Name</p>
-          <div>
-            <input
-              onChange={this.handleName}
-              className="inpu"
-              type="text"
-              name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-              required
-              value={this.state.name}
-            />
-          </div>
-          <div>
-            <p className="name">Number</p>
-            <input
-              onChange={this.handleNumber}
-              className="inpu"
-              type="tel"
-              name="number"
-              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-              required
-              value={this.state.number}
-            />
-          </div>
-          <button className="add" onClick={this.handleSubmit}>
-            add contact
-          </button>
+        <div>
+          <Form onFormSubmit={this.handleSumbit} />
         </div>
+        <Contacts
+          contacts={filteredContacts}
+          onFilterChange={this.handleFilterChange}
+          onDeleteContact={this.handleDeleteContact}
+        />
       </div>
     );
   }
